@@ -84,6 +84,7 @@ export default function Content({
         .catch(
           (error) => console.log('Failed to save submission:', error)
         )
+        .finally(() => setOpenSnackBar(false))
       }
     );
 
