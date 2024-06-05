@@ -42,6 +42,7 @@ export default function Content({
       setFetchSuccess(true);
       const { formSubmissions } = data;
       setSubmission(formSubmissions);
+      if (submission.length === 0) setSubmissionListText('No submission is found.')
     })
     .catch(
       (error) => {
