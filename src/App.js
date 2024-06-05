@@ -5,11 +5,18 @@ import Header from './Header';
 import Content from './Content';
 
 function App() {
+  const [openSnackBar, setOpenSnackBar] = React.useState(false);
+
   return (
     <>
-      <Header />
+      <Header 
+        setOpenSnackBar={setOpenSnackBar}
+      />
       <Container>
-        <Content />
+        <Content 
+          openSnackBar={openSnackBar}
+          setOpenSnackBar={setOpenSnackBar}
+        />
       </Container>
     </>
   );
