@@ -19,6 +19,7 @@ export default function Content({
   setOpenSnackBar,
 }) {
   const [submission, setSubmission] = useState([]);
+  const [toastData, setToastData] = useState({})
 
   const theme = createTheme({
     palette: {
@@ -85,6 +86,13 @@ export default function Content({
         )
       }
     );
+
+    // set toast display text when new form submission is created
+    onMessage(
+      (formSubmission) => {
+        setToastData(formSubmission)
+      }
+    )
   }, []);
 
   const action = (
@@ -119,7 +127,19 @@ export default function Content({
           open={openSnackBar}
           autoHideDuration={6000}
           onClose={handleClose}
-          message="Message"
+          message={
+            <span>
+              { toastData.data ? 
+              (
+                <>
+                  {`${toastData?.data?.firstName} ${toastData?.data?.lastName}`}<br />
+                  {toastData?.data?.email}
+                </>
+              ) : 
+              'New submission received'
+              }
+            </span>
+          }
           action={action}
         />
       </Box>
