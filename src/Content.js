@@ -20,6 +20,8 @@ export default function Content({
 }) {
   const [submission, setSubmission] = useState([]);
   const [toastData, setToastData] = useState({})
+  const [fetchSuccess, setFetchSuccess] = useState(true);
+  const [submissionListText, setSubmissionListText] = useState('Fetching submission list. Please wait.')
 
   const theme = createTheme({
     palette: {
@@ -37,11 +39,16 @@ export default function Content({
     retry(fetchLikedFormSubmissions, 3)
     .then((data) => {
       console.log('Success fetching submission')
+      setFetchSuccess(true);
       const { formSubmissions } = data;
       setSubmission(formSubmissions);
     })
     .catch(
-      (error) => console.log('Failed to fetch submission:', error)
+      (error) => {
+        console.log('Failed to fetch submission:', error)
+        setFetchSuccess(false)
+        setSubmissionListText('Fail to fetch submission. Please retry.')
+      }
     );
   }
 
@@ -118,7 +125,9 @@ export default function Content({
         <Typography variant="h4">Liked Form Submissions</Typography>
 
         <Typography component='div' variant="body1" sx={{ fontStyle: 'italic', marginTop: 1 }}>
-          {_.map(submission, ({data}, i) => {
+          { submission.length === 0 || !fetchSuccess ?
+            <span>{submissionListText}</span> : 
+            _.map(submission, ({data}, i) => {
             const { email, firstName, lastName } = data
             return <div key={i}> email: {email}, firstName: {firstName}, lastName: {lastName}</div>
           })}
