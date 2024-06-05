@@ -5,18 +5,28 @@ import Snackbar from '@mui/material/Snackbar';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 export default function Content({ 
   openSnackBar, 
   setOpenSnackBar
 }) {
+
+  const theme = createTheme({
+    palette: {
+      aquaBlue: {
+        main: "#aee2eb",
+      },
+    },
+  });
+
   const handleClose = () => {
     setOpenSnackBar(false);
   };
 
   const action = (
     <React.Fragment>
-      <Button color="secondary" size="small" onClick={handleClose}>
+      <Button color="aquaBlue" size="small" onClick={handleClose}>
         LIKE
       </Button>
       <IconButton
@@ -31,19 +41,22 @@ export default function Content({
   );
 
   return (
-    <Box sx={{marginTop: 3}}>
-      <Typography variant="h4">Liked Form Submissions</Typography>
+    <ThemeProvider theme={theme}>
+      <Box sx={{marginTop: 3}}>
+        <Typography variant="h4">Liked Form Submissions</Typography>
 
-      <Typography variant="body1" sx={{fontStyle: 'italic', marginTop: 1}}>
-        TODO: List of liked submissions here (delete this line)
-      </Typography>
-      <Snackbar
-        open={openSnackBar}
-        autoHideDuration={6000}
-        onClose={handleClose}
-        message="Message"
-        action={action}
-      />
-    </Box>
+        <Typography variant="body1" sx={{fontStyle: 'italic', marginTop: 1}}>
+          TODO: List of liked submissions here (delete this line)
+        </Typography>
+        <Snackbar
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          open={openSnackBar}
+          autoHideDuration={6000}
+          onClose={handleClose}
+          message="Message"
+          action={action}
+        />
+      </Box>
+    </ThemeProvider>
   );
 }
