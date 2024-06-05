@@ -129,7 +129,7 @@ export default function Content({
             <span>{submissionListText}</span> : 
             _.map(submission, ({data}, i) => {
             const { email, firstName, lastName } = data
-            return <div key={i}> email: {email}, firstName: {firstName}, lastName: {lastName}</div>
+            return <div key={i}> <b>Email:</b> {email}, <b>First Name:</b> {firstName}, <b>Last Name:</b> {lastName}</div>
           })}
         </Typography>
         <Snackbar
