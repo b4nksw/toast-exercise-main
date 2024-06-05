@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Snackbar from '@mui/material/Snackbar';
@@ -6,16 +6,24 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import _ from 'lodash'
 
-export default function Content({ 
-  openSnackBar, 
-  setOpenSnackBar
+import {
+  onMessage,
+  fetchLikedFormSubmissions,
+  saveLikedFormSubmission,
+} from './service/mockServer';
+
+export default function Content({
+  openSnackBar,
+  setOpenSnackBar,
 }) {
+  const [submission, setSubmission] = useState([]);
 
   const theme = createTheme({
     palette: {
       aquaBlue: {
-        main: "#aee2eb",
+        main: '#aee2eb',
       },
     },
   });
@@ -23,6 +31,30 @@ export default function Content({
   const handleClose = () => {
     setOpenSnackBar(false);
   };
+
+  const fetchSubmissions = () => {
+    fetchLikedFormSubmissions().then((data) => {
+      const { formSubmissions } = data;
+      setSubmission(formSubmissions);
+    });
+  }
+
+  useEffect(() => {
+    // get submission when boot up
+    fetchSubmissions()
+
+    // add on message callback
+    onMessage(
+      (formSubmission) => saveLikedFormSubmission(formSubmission).then(
+        (value) => {
+          if (value.status === 202){
+            console.log('Success saving submission')
+            fetchSubmissions()
+          }
+        }
+      )
+    );
+  }, []);
 
   const action = (
     <React.Fragment>
@@ -42,11 +74,14 @@ export default function Content({
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{marginTop: 3}}>
+      <Box sx={{ marginTop: 3 }}>
         <Typography variant="h4">Liked Form Submissions</Typography>
 
-        <Typography variant="body1" sx={{fontStyle: 'italic', marginTop: 1}}>
-          TODO: List of liked submissions here (delete this line)
+        <Typography component='div' variant="body1" sx={{ fontStyle: 'italic', marginTop: 1 }}>
+          {_.map(submission, ({data}, i) => {
+            const { email, firstName, lastName } = data
+            return <div key={i}> email: {email}, firstName: {firstName}, lastName: {lastName}</div>
+          })}
         </Typography>
         <Snackbar
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
