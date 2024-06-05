@@ -33,9 +33,34 @@ export default function Content({
   };
 
   const fetchSubmissions = () => {
-    fetchLikedFormSubmissions().then((data) => {
+    retry(fetchLikedFormSubmissions, 3)
+    .then((data) => {
+      console.log('Success fetching submission')
       const { formSubmissions } = data;
       setSubmission(formSubmissions);
+    })
+    .catch(
+      (error) => console.log('Failed to fetch submission:', error)
+    );
+  }
+
+  const retry = (fn, retries) => {
+    return new Promise((resolve, reject) => {
+      const attempt = (retryCount) => {
+        fn()
+        .then(resolve)
+        .catch((error) => {
+          console.log('Retry fn failed')
+          if (retryCount === 0) {
+            console.log('No more retry attempts, throw error:', error)
+            reject(error);
+          } else {
+            console.log(`retry attempt: ${retries - retryCount}`)
+            attempt(retryCount - 1);
+          }
+        });
+      };
+      attempt(retries);
     });
   }
 
@@ -45,14 +70,20 @@ export default function Content({
 
     // add on message callback
     onMessage(
-      (formSubmission) => saveLikedFormSubmission(formSubmission).then(
-        (value) => {
-          if (value.status === 202){
-            console.log('Success saving submission')
-            fetchSubmissions()
+      (formSubmission) => {
+        retry(() => saveLikedFormSubmission(formSubmission), 3)
+        .then(
+          (value) => {
+            if (value.status === 202){
+              console.log('Success saving submission')
+              fetchSubmissions()
+            }
           }
-        }
-      )
+        )
+        .catch(
+          (error) => console.log('Failed to save submission:', error)
+        )
+      }
     );
   }, []);
 
