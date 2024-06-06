@@ -129,8 +129,8 @@ export default function Content({
           { submission.length === 0 || !fetchSuccess ?
             <span>{submissionListText}</span> : 
             _.map(submission, ({data}, i) => {
-            const { email, firstName, lastName } = data
-            return <div key={i}> <b>Email:</b> {email}, <b>First Name:</b> {firstName}, <b>Last Name:</b> {lastName}</div>
+              const { email, firstName, lastName } = data
+              return <div key={i}><b>Email:</b> {email}, <b>First Name:</b> {firstName}, <b>Last Name:</b> {lastName}</div>
           })}
         </Typography>
         <Snackbar
