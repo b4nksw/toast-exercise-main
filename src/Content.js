@@ -20,14 +20,21 @@ export default function Content({
 }) {
   const [submission, setSubmission] = useState([]);
   const [toastData, setToastData] = useState({})
+  const [submissionStatus, setSubmissionStatus] = useState('PROCESSING');
   const [fetchSuccess, setFetchSuccess] = useState(true);
   const [submissionListText, setSubmissionListText] = useState('Fetching submission list. Please wait.')
 
   const theme = createTheme({
     palette: {
-      aquaBlue: {
-        main: '#aee2eb',
+      processing: {
+        main: '#f6b331',
       },
+      success: {
+        main: '#49d749',
+      },
+      fail: {
+        main: '#e93535',
+      }
     },
   });
 
@@ -61,9 +68,11 @@ export default function Content({
         .catch((error) => {
           console.log('Retry fn failed')
           if (retryCount === 0) {
+            // reject if no more retry attempts
             console.log('No more retry attempts, throw error:', error)
             reject(error);
           } else {
+            // retry if max retry count is not hit
             console.log(`retry attempt: ${retries - retryCount}`)
             attempt(retryCount - 1);
           }
@@ -85,14 +94,23 @@ export default function Content({
           (value) => {
             if (value.status === 202){
               console.log('Success saving submission')
+              setSubmissionStatus('SUCCESS')
               fetchSubmissions()
             }
           }
         )
         .catch(
-          (error) => console.log('Failed to save submission:', error)
+          (error) => {
+            console.log('Failed to save submission:', error)
+            setSubmissionStatus('FAIL')
+          }
         )
-        .finally(() => setOpenSnackBar(false))
+        .finally(() => 
+          setTimeout(() => {
+            setOpenSnackBar(false)
+            setTimeout(() => setSubmissionStatus('PROCESSING'), 500) // to make sure the snackbar is completely closed before updating status
+          }, 1000)
+        );
       }
     );
 
@@ -106,8 +124,8 @@ export default function Content({
 
   const action = (
     <React.Fragment>
-      <Button color="aquaBlue" size="small" onClick={handleClose}>
-        LIKE
+      <Button color={submissionStatus.toLowerCase()} size="small" onClick={handleClose}>
+        {submissionStatus}
       </Button>
       <IconButton
         size="small"
@@ -136,7 +154,7 @@ export default function Content({
         <Snackbar
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           open={openSnackBar}
-          autoHideDuration={6000}
+          autoHideDuration={10000}
           onClose={handleClose}
           message={
             <span>
